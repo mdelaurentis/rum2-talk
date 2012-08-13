@@ -2,7 +2,7 @@
 \usepackage[latin1]{inputenc}
 \usepackage{hyperref}
 \usetheme{Singapore}
-\title[RUM 2]{RUM 2}
+\title[RUM 2]{RUM 2 (RNA-Seq Unified Mapper)}
 \bibliographystyle{unsrt}
 \author{Mike DeLaurentis}
 \institute{University of Pennsylvania}
@@ -74,6 +74,18 @@
 \includegraphics[scale=0.4]{rumpouring2.png}
   \end{columns}
 
+\end{frame}
+
+\begin{frame}{Phases}
+  \begin{description}
+    \item [Preprocessing] 
+      Split the input into N chunks.
+    \item [Processing] Run Bowtie and Blat. Each chunk can be
+      processed independently of the others.
+    \item [Postprocessing] Merge alignments for chunks
+      together. Produce coverage files, quantifications, junction
+      files, find novel internal exons.
+  \end{description}
 \end{frame}
 
 \begin{frame}{Work distribution}

@@ -124,14 +124,21 @@
 
 \subsection{Installation}
 
-\begin{frame}{Installation}
+\begin{frame}{Installing RUM}
   \begin{itemize}
   \item Uses standard Perl Makefile.PL
   \item Should be familiar to system administrators
   \item Download tarball from \texttt{https://github.com/PGFI/rum/downloads}
   \item Run \texttt{perl Makefile.PL}
-  \item Install indexes using \texttt{bin/rum\_indexes}
-  \item That's it!
+  \item Then install indexes...
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Installing Indexes}
+  \begin{itemize}
+  \item RUM needs an index for each organism you want to align against
+  \item Index includes genome, gene annotations, and binary index files for Bowtie
+  \item Run \texttt{rum\_indexes}; it will guide you through the process
   \end{itemize}
 \end{frame}
 

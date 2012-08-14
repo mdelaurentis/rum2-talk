@@ -1,7 +1,9 @@
 \documentclass{beamer}
 \usepackage[latin1]{inputenc}
 \usepackage{hyperref}
-\usetheme{Singapore}
+\usetheme{Copenhagen}
+%\usetheme{Singapore}
+%\usetheme{Montpellier}
 \title[RUM 2]{RUM 2 (RNA-Seq Unified Mapper)}
 \bibliographystyle{unsrt}
 \author{Mike DeLaurentis}
@@ -17,7 +19,6 @@
   \end{frame}
 }
 
-
 \begin{document}
 
 \begin{frame}
@@ -28,88 +29,100 @@
   \tableofcontents
 \end{frame}
 
-\begin{frame}{About me}
+\section{Intro}
+
+\begin{frame}{Who am I?}
   \begin{itemize}
+  \item Working at Penn (ITMAT) since January
   \item Software engineering background
-  \item Working at Penn since January
-  \item Experience in a variety of languages (Perl, Java, Clojure (lisp), Python, Ruby)
+  \item Experience in a variety of languages, (Perl, Java, Clojure (lisp), Python, Ruby)
+  \item ... and applications
   \end{itemize}
 \end{frame}
 
-\section{The RUM Pipeline}
-
-\begin{frame}{About RUM}
+\begin{frame}{What is RUM?}
   \begin{itemize}
-  \item ``RUM is an alignment, junction calling, and feature quantification pipeline specifically designed for Illumina RNA-Seq data''
+  \item \textit{``RUM is an alignment, junction calling, and feature quantification pipeline specifically designed for Illumina RNA-Seq data''}
   \item Written by Gregory Grant (ggrant@grant.org)
   \item Runs on Linux / UNIX / Mac
   \item Can distribute work across multiple machines
-  \item Written in Perl 5
   \end{itemize}
 \end{frame}
 
-\begin{frame}{The RUM Pipeline}
+\begin{frame}{What is RUM?}
+  \begin{columns}
+    \column{3in}
+    \begin{description}
+    \item [Inputs]
+      \begin{itemize}
+      \item RNA-Seq reads
+      \item FASTA or FASTQ
+      \item Paired or single
+      \end{itemize}
+    \item [Outputs]
+      \begin{itemize}
+      \item Unique and non-unique alignments
+      \item Coverage plots
+      \item Feature quantifications
+      \item Junction calls
+      \item List of novel inferred internal exons
+      \end{itemize}
+    \end{description}
+    \column{2.5in}
+    \includegraphics[scale=0.4]{rumpouring2.png}
+  \end{columns}
+\end{frame}
+
+
+\section{The RUM pipeline}
+
+\begin{frame}{Phase 1: Preprocessing}
+
+  \begin{itemize}
+  \item Perform some quality checks on reads
+  \item Split reads into N chunks
+  \item Allows reads to be processed by N nodes on a cluster
+  \end{itemize}
+
+\end{frame}
+
+\begin{frame}{Phase 2: Processing}
+
 \begin{itemize}
   \item Align all reads against genome using Bowtie
   \item Align all reads against transcriptome using Bowtie
   \item Merge genome and transcriptome alignments and identify unmapped reads
   \item Align unmapped reads against genome using BLAT
+
+  \item \textit{``This leverages the advantages of both genome and transcriptome mapping as well as combining the speed of Bowtie with the sensitivity and flexibility of Blat.''}
+
   \item Merge Bowtie and Blat alignments
-  \item Produce some output files based on merged results
 \end{itemize}
 \end{frame}
 
-\begin{frame}{RUM output files}
-  \begin{columns}
-    \column{2.5in}
-\begin{itemize}
-  \item Files of unique and non-unique alignments
-  \item All alignments in SAM format
-  \item Coverage plots
-  \item Feature quantifications
-  \item Junction calls
-  \item List of novel inferred internal exons
-\end{itemize}
-\column{2.5in}
-\includegraphics[scale=0.4]{rumpouring2.png}
-  \end{columns}
+\begin{frame}{Phase 3: Postprocessing}
+
+  \begin{itemize}
+  \item Merge alignments for all chunks together
+  \item Produce coverage plots, junction files
+  \item Find novel internal exons
+  \item Generate some reports
+  \end{itemize}
 
 \end{frame}
 
-\begin{frame}{Phases}
-  \begin{description}
-    \item [Preprocessing] 
-      Split the input into N chunks.
-      \pause
-    \item [Processing] Run Bowtie and Blat. Each chunk can be
-      processed independently of the others.
-      \pause
-    \item [Postprocessing] Merge alignments for chunks
-      together. Produce coverage files, quantifications, junction
-      files, find novel internal exons.
-  \end{description}
+\section{Tour of the new RUM}
+
+\begin{frame}{RUM 2 Goals}
+  \begin{itemize}
+  \item More code reuse for maintainability
+  \item Improve inter-process communication
+  \item More robust job state management
+  \item Automated tests
+  \end{itemize}
 \end{frame}
 
-\begin{frame}{Work distribution}
-  \begin{columns}
-    \column{2.5in}
-    \includegraphics[scale=0.4]{doozers.jpg}    
-    \column{2.5in}
-    \begin{itemize}
-    \item RUM can run alignment phase in parallel
-    \item Splits input reads into N chunks
-    \item Alignment for each chunk is independent of other chunks
-    \item Results are merged together for coverage, quantification,
-      junction calling
-    \end{itemize}
-  \end{columns}
-
-
-\end{frame}
-
-\section{Enhancements in RUM 2}
-
-\begin{frame}{RUM 2 Features}
+\begin{frame}{Enhancements in RUM 2}
   \begin{itemize}
   \item Standard installation process
   \item New command-line interface
@@ -129,7 +142,8 @@
   \item Uses standard Perl Makefile.PL
   \item Should be familiar to system administrators
   \item Download tarball from \texttt{https://github.com/PGFI/rum/downloads}
-  \item Run \texttt{perl Makefile.PL}
+  \item \texttt{perl Makefile.PL}
+  \item \texttt{make install} (optional)
   \item Then install indexes...
   \end{itemize}
 \end{frame}
@@ -160,8 +174,7 @@
 
 \end{frame}
 
-
-\begin{frame}[fragile]{rum\_runner align}
+\begin{frame}[fragile]{Running an alignment}
 Use \texttt{rum\_runner align} to run an alignment:
 \begin{verbatim}
 rum_runner align \
@@ -173,8 +186,7 @@ rum_runner align \
 \end{verbatim}
 \end{frame}
 
-
-\subsection{Job status}
+\subsection{Job state management}
 
 \begin{frame}[fragile]{Job status}
   \begin{itemize}
@@ -214,15 +226,15 @@ X X    XX XX  XXX   XXXX  Generate quants
 \begin{verbatim}
 Postprocessing
 --------------
-  Merge RUM_NU files
-  Make non-unique coverage
-  Merge RUM_Unique files
-  Compute mapping statistics
-  Make unique coverage
-  Finish mapping stats
-  Merge SAM headers
-  Concatenate SAM files
-  Merge quants
+X Merge RUM_NU files
+X Make non-unique coverage
+X Merge RUM_Unique files
+X Compute mapping statistics
+X Make unique coverage
+X Finish mapping stats
+X Merge SAM headers
+X Concatenate SAM files
+X Merge quants
   make_junctions
   Sort junctions (all, bed) by location
   Sort junctions (all, rum) by location
@@ -237,23 +249,34 @@ RUM is running (job ids 815718, 815720).
 \end{verbatim}
 \end{frame}
 
+\begin{frame}{Job state management}
+  \begin{itemize}
+  \item Model the workflow as a state machine
+  \item A completed step transitions the job from one state to another
+  \item Stitch steps together into a workflow
+  \item Determine the state of a job by looking at which output
+    files exist
+  \item Similar to GNU Make (but simpler)
+  \item Basis for a lot of additional features
+  \end{itemize}
+\end{frame}
+
 \begin{frame}{Recovering from errors}
   \begin{columns}[c]
-    \column{2.5in}
+    \column{2in}
     \includegraphics[scale=0.2]{success.jpg}
     \column{2.5in}
     \begin{itemize}
 
-    \item Sometimes bad things happen
+    \item In case of failure...
 
-    \item RUM 2 allows easier recovery from infrastructure failures
+    \item RUM 2 allows easier recovery
 
-    \item Running ``\texttt{rum\_runner align}'' again will restart a
-      job from where it left off
+    \item Running ``\texttt{rum\_runner align}'' again, RUM will determine what state the job was in when it failed
+
+    \item Just resumes at the next uncompleted step
 
     \item Can save \textit{a lot} of time when recovering from infrastructure failure
-
-    \item Determines state of job by looking at which output files exist
 
     \end{itemize}
 
@@ -268,70 +291,131 @@ RUM is running (job ids 815718, 815720).
 \end{verbatim}
 \item Useful if you've run a job with incorrect parameters and need to start over
 \end{itemize}
+\end{frame}
+
+\subsection{Work distribution}
+
+\begin{frame}{Work distribution}
+  \begin{columns}
+    \column{2.5in}
+    \includegraphics[scale=0.4]{doozers.jpg}    
+    \column{2.5in}
+    \begin{itemize}
+    \item Automatic support for one multi-core machine (will run each chunk in a separate process by default)
+    \item Built-in support for Sun Grid Engine, with \texttt{--qsub} option
+    \item Easily extensible for other platforms
+    \end{itemize}
+  \end{columns}
+\end{frame}
+
+\begin{frame}[fragile]{Work distribution}
+
+For other platforms, you can either extend a Perl class to provide
+support, or set up some scripts to run the parts of the job on
+different machines:
+
+\pause
+
+\begin{itemize}
+\item  Run preprocessing alone:
+
+\begin{verbatim}
+rum_runner -o <dir> --preprocess
+\end{verbatim}
+
+\pause
+
+\item Run chunks one at a time:
+
+\begin{verbatim}
+rum_runner -o <dir> --process --chunk 8
+\end{verbatim}
+
+\pause
+
+\item Run postprocessing alone:
+
+\begin{verbatim}
+rum_runner -o <dir> --preprocess
+\end{verbatim}
+
+\end{itemize}
 
 \end{frame}
 
 % http://tomboythatwearsmakeup.com/wp-content/uploads/2011/03/dz_fr_012-1.jpg
 
-\section{Demo}
-
 \section{Web resources}
 
-\begin{frame}{Main Github page}
-  \url{https://github.com/PGFI/rum}
-  \includegraphics[scale=0.2]{github-main.png}
+\begin{frame}{Web resources}
+  \begin{description}
+    \item [Main github page] 
+      \url{https://github.com/PGFI/rum}
+
+    \item [User guide] 
+      \url{https://github.com/PGFI/rum/wiki}
+
+    \item [Issues] 
+      \url{https://github.com/PGFI/rum/issues}
+
+    \item [Downloads] 
+      \url{https://github.com/PGFI/rum/downloads}
+    
+  \end{description}
 \end{frame}
 
-\subsection{User guide}
+\section{Demo}
 
-\centering
-\begin{frame}{User guide}
-  \url{https://github.com/PGFI/rum/wiki}
-  \includegraphics[scale=0.2]{github-main-wiki.png}
-\end{frame}
+%\subsection{User guide}
 
-\centering
-\begin{frame}{User guide}
-  \url{https://github.com/PGFI/rum/wiki}
-  \includegraphics[scale=0.2]{github-wiki.png}
-\end{frame}
+%\centering
+%\begin{frame}{User guide}
+%  \url{https://github.com/PGFI/rum/wiki}
+%  \includegraphics[scale=0.2]{github-main-wiki.png}
+%\end{frame}
 
-\subsection{Downloads}
+%\centering
+%\begin{frame}{User guide}
+%  \url{https://github.com/PGFI/rum/wiki}
+%  \includegraphics[scale=0.2]{github-wiki.png}
+%\end{frame}
 
-\centering
-\begin{frame}{Downloads}
-  \url{https://github.com/PGFI/rum/downloads}
-  \includegraphics[scale=0.2]{github-main-downloads.png}
-\end{frame}
+%\subsection{Downloads}
 
-\centering
-\begin{frame}{Downloads}
-  \url{https://github.com/PGFI/rum/downloads}
-  \includegraphics[scale=0.2]{github-downloads.png}
-\end{frame}
+%\centering
+%\begin{frame}{Downloads}
+%  \url{https://github.com/PGFI/rum/downloads}
+%  \includegraphics[scale=0.2]{github-main-downloads.png}
+%\end{frame}
 
-\subsection{Issues}
+%\centering
+%\begin{frame}{Downloads}
+%  \url{https://github.com/PGFI/rum/downloads}
+%  \includegraphics[scale=0.2]{github-downloads.png}
+%\end{frame}
 
-\centering
-\begin{frame}{Issues}
-  \url{https://github.com/PGFI/rum/issues}
-  \includegraphics[scale=0.2]{github-main-issues.png}
-\end{frame}
+%\subsection{Issues}
 
-\centering
-\begin{frame}{Issues}
-  \url{https://github.com/PGFI/rum/issues}
-  \includegraphics[scale=0.2]{github-issues.png}
-\end{frame}
+%\centering
+%\begin{frame}{Issues}
+%  \url{https://github.com/PGFI/rum/issues}
+%  \includegraphics[scale=0.2]{github-main-issues.png}
+%\end{frame}
 
-\section{Future direction}
+%\centering
+%\begin{frame}{Issues}
+%  \url{https://github.com/PGFI/rum/issues}
+%  \includegraphics[scale=0.2]{github-issues.png}
+%\end{frame}
 
-\begin{frame}{Possible future enhancements}
-  \begin{itemize}
-  \item Use original read names throughout the pipeline
-  \item Performance improvements
-  \end{itemize}
-\end{frame}
+%\section{Future direction}
+
+%\begin{frame}{Possible future enhancements}
+%  \begin{itemize}
+%  \item Use original read names throughout the pipeline
+%  \item Performance improvements
+%  \end{itemize}
+%\end{frame}
 
 
 

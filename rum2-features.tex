@@ -40,12 +40,14 @@
   \end{itemize}
 \end{frame}
 
+\section{The RUM pipeline}
+
 \begin{frame}{What is RUM?}
   \begin{itemize}
   \item \textit{``RUM is an alignment, junction calling, and feature quantification pipeline specifically designed for Illumina RNA-Seq data''}
   \item Written by Gregory Grant (ggrant@grant.org)
   \item Runs on Linux / UNIX / Mac
-  \item Can distribute work across multiple machines
+  \item Distributed (optionally)
   \end{itemize}
 \end{frame}
 
@@ -55,10 +57,10 @@
     \begin{description}
     \item [Inputs]
       \begin{itemize}
-      \item RNA-Seq reads
-      \item FASTA or FASTQ
-      \item Paired or single
+      \item RNA-Seq reads: FASTA or FASTQ, paired or single
+      \item Organism-specific index
       \end{itemize}
+      \pause
     \item [Outputs]
       \begin{itemize}
       \item Unique and non-unique alignments
@@ -73,17 +75,29 @@
   \end{columns}
 \end{frame}
 
-
-\section{The RUM pipeline}
+\begin{frame}
+  RUM has three distinct phases:
+  \begin{itemize}
+  \item Preprocessing
+  \item Processing
+  \item Postprocessing
+  \end{itemize}
+\end{frame}
 
 \begin{frame}{Phase 1: Preprocessing}
 
+  \begin{columns}
+    \column{2in}
+%http://upload.wikimedia.org/wikipedia/commons/2/29/Cut_sugarcane.jpg
+    \includegraphics[scale=0.06]{Cut_sugarcane.jpg}
+    \column{3in}
   \begin{itemize}
   \item Perform some quality checks on reads
   \item Split reads into N chunks
   \item Allows reads to be processed by N nodes on a cluster
   \end{itemize}
 
+  \end{columns}
 \end{frame}
 
 \begin{frame}{Phase 2: Processing}
@@ -102,13 +116,21 @@
 
 \begin{frame}{Phase 3: Postprocessing}
 
-  \begin{itemize}
-  \item Merge alignments for all chunks together
-  \item Produce coverage plots, junction files
-  \item Find novel internal exons
-  \item Generate some reports
-  \end{itemize}
+  \begin{columns}
+    \column{2.5in}
+    \begin{itemize}
+    \item Merge alignments for all chunks together
+    \item Produce coverage plots, junction files
+    \item Find novel internal exons
+    \item Generate some reports
+    \end{itemize} 
+    \column{2.5in}
+    \includegraphics[scale=0.2]{Rum_in_barrels_at_travellers_distillery.jpg}
+  \end{columns}
 
+
+
+%http://upload.wikimedia.org/wikipedia/en/9/98/Rum_in_barrels_at_travellers_distillery.jpg
 \end{frame}
 
 \section{Tour of the new RUM}
@@ -152,6 +174,7 @@
   \begin{itemize}
   \item RUM needs an index for each organism you want to align against
   \item Index includes genome, gene annotations, and binary index files for Bowtie
+  \item Index installation is now separate from code installation / upgrade
   \item Run \texttt{rum\_indexes}; it will guide you through the process
   \end{itemize}
 \end{frame}
@@ -175,14 +198,14 @@
 \end{frame}
 
 \begin{frame}[fragile]{Running an alignment}
-Use \texttt{rum\_runner align} to run an alignment:
+Use ``\texttt{rum\_runner align}'' to run an alignment:
 \begin{verbatim}
 rum_runner align \
-  --output dir \
+  --output ~/sample123/results \
   --index  ~/rum_indexes/hg19 \
   --name   TestJob \
   --chunks 25 \
-  ~/samples/forward.fq ~/samples/reverse.fq
+  ~/sample123/forward.fq ~/sample123/reverse.fq
 \end{verbatim}
 \end{frame}
 
@@ -195,57 +218,59 @@ rum_runner align \
   \end{itemize}
   \tiny
 \begin{verbatim}
-Processing in 25 chunks
------------------------
-XXXXXXXXXXXXXXXXXXXXXXXXX Run bowtie on genome
-XXXXXXXXXXXXXXXXXXXXXXXXX Parse genome Bowtie output
-X XXX  XX XX XXXX  XXXXX  Run bowtie on transcriptome
-X XXX  XX XX XXXX  XXXXX  Parse transcriptome Bowtie output
-X XXX  XX XX XXXX  XXXXX  Merge unique mappers together
-X XXX  XX XX XXXX  XXXXX  Merge non-unique mappers together
-X XXX  XX XX XXXX  XXXXX  Make unmapped reads file for blat
-X XXX  XX XX XXXX  XXXXX  Run blat on unmapped reads
-X XXX  XX XX XXXX  XXXXX  Run mdust on unmapped reads
-X XXX  XX XX XXXX  XXXXX  Parse blat output
-X XXX  XX XX XXXX  XXXXX  Merge bowtie and blat results
-X XX   XX XX  XXX   XXXX  Clean up RUM files
-X XX   XX XX  XXX   XXXX  Produce RUM_Unique
-X XX   XX XX  XXX   XXXX  Sort RUM_Unique by location
-X X    XX XX  XXX   XXXX  Sort cleaned non-unique mappers by ID
-X X    XX XX  XXX   XXXX  Remove duplicates from NU
-X X    XX XX  XXX   XXXX  Create SAM file
-X X    XX XX  XXX   XXXX  Create non-unique stats
-X X    XX XX  XXX   XXXX  Sort RUM_NU
-X X    XX XX  XXX   XXXX  Generate quants
-...
+            $ rum_runner status -o ~/sample123/results
+            
+            Processing in 25 chunks
+            -----------------------
+            XXXXXXXXXXXXXXXXXXXXXXXXX Run bowtie on genome
+            XXXXXXXXXXXXXXXXXXXXXXXXX Parse genome Bowtie output
+            X XXX  XX XX XXXX  XXXXX  Run bowtie on transcriptome
+            X XXX  XX XX XXXX  XXXXX  Parse transcriptome Bowtie output
+            X XXX  XX XX XXXX  XXXXX  Merge unique mappers together
+            X XXX  XX XX XXXX  XXXXX  Merge non-unique mappers together
+            X XXX  XX XX XXXX  XXXXX  Make unmapped reads file for blat
+            X XXX  XX XX XXXX  XXXXX  Run blat on unmapped reads
+            X XXX  XX XX XXXX  XXXXX  Run mdust on unmapped reads
+            X XXX  XX XX XXXX  XXXXX  Parse blat output
+            X XXX  XX XX XXXX  XXXXX  Merge bowtie and blat results
+            X XX   XX XX  XXX   XXXX  Clean up RUM files
+            X XX   XX XX  XXX   XXXX  Produce RUM_Unique
+            X XX   XX XX  XXX   XXXX  Sort RUM_Unique by location
+            X X    XX XX  XXX   XXXX  Sort cleaned non-unique mappers by ID
+            X X    XX XX  XXX   XXXX  Remove duplicates from NU
+            X X    XX XX  XXX   XXXX  Create SAM file
+            X X    XX XX  XXX   XXXX  Create non-unique stats
+            X X    XX XX  XXX   XXXX  Sort RUM_NU
+            X X    XX XX  XXX   XXXX  Generate quants
+            ...
 \end{verbatim}
 \end{frame}
 
 \begin{frame}[fragile]{Job status}
 \tiny
 \begin{verbatim}
-Postprocessing
---------------
-X Merge RUM_NU files
-X Make non-unique coverage
-X Merge RUM_Unique files
-X Compute mapping statistics
-X Make unique coverage
-X Finish mapping stats
-X Merge SAM headers
-X Concatenate SAM files
-X Merge quants
-  make_junctions
-  Sort junctions (all, bed) by location
-  Sort junctions (all, rum) by location
-  Sort junctions (high-quality, bed) by location
-  Get inferred internal exons
-  Quantify novel exons
-
-All the chunk error log files are empty. That's good.
-Main error log file is empty. That's good.
-
-RUM is running (job ids 815718, 815720).
+            Postprocessing
+            --------------
+            X Merge RUM_NU files
+            X Make non-unique coverage
+            X Merge RUM_Unique files
+            X Compute mapping statistics
+            X Make unique coverage
+            X Finish mapping stats
+            X Merge SAM headers
+            X Concatenate SAM files
+            X Merge quants
+              make_junctions
+              Sort junctions (all, bed) by location
+              Sort junctions (all, rum) by location
+              Sort junctions (high-quality, bed) by location
+              Get inferred internal exons
+              Quantify novel exons
+            
+            All the chunk error log files are empty. That's good.
+            Main error log file is empty. That's good.
+            
+            RUM is running (job ids 815718, 815720).
 \end{verbatim}
 \end{frame}
 
@@ -336,7 +361,7 @@ rum_runner -o <dir> --process --chunk 8
 \item Run postprocessing alone:
 
 \begin{verbatim}
-rum_runner -o <dir> --preprocess
+rum_runner -o <dir> --postprocess
 \end{verbatim}
 
 \end{itemize}
@@ -345,7 +370,9 @@ rum_runner -o <dir> --preprocess
 
 % http://tomboythatwearsmakeup.com/wp-content/uploads/2011/03/dz_fr_012-1.jpg
 
-\section{Web resources}
+\section{Demo}
+
+\subsection{Web resources}
 
 \begin{frame}{Web resources}
   \begin{description}
@@ -364,59 +391,10 @@ rum_runner -o <dir> --preprocess
   \end{description}
 \end{frame}
 
-\section{Demo}
+\subsection{Run tiny job}
 
-%\subsection{User guide}
-
-%\centering
-%\begin{frame}{User guide}
-%  \url{https://github.com/PGFI/rum/wiki}
-%  \includegraphics[scale=0.2]{github-main-wiki.png}
-%\end{frame}
-
-%\centering
-%\begin{frame}{User guide}
-%  \url{https://github.com/PGFI/rum/wiki}
-%  \includegraphics[scale=0.2]{github-wiki.png}
-%\end{frame}
-
-%\subsection{Downloads}
-
-%\centering
-%\begin{frame}{Downloads}
-%  \url{https://github.com/PGFI/rum/downloads}
-%  \includegraphics[scale=0.2]{github-main-downloads.png}
-%\end{frame}
-
-%\centering
-%\begin{frame}{Downloads}
-%  \url{https://github.com/PGFI/rum/downloads}
-%  \includegraphics[scale=0.2]{github-downloads.png}
-%\end{frame}
-
-%\subsection{Issues}
-
-%\centering
-%\begin{frame}{Issues}
-%  \url{https://github.com/PGFI/rum/issues}
-%  \includegraphics[scale=0.2]{github-main-issues.png}
-%\end{frame}
-
-%\centering
-%\begin{frame}{Issues}
-%  \url{https://github.com/PGFI/rum/issues}
-%  \includegraphics[scale=0.2]{github-issues.png}
-%\end{frame}
-
-%\section{Future direction}
-
-%\begin{frame}{Possible future enhancements}
-%  \begin{itemize}
-%  \item Use original read names throughout the pipeline
-%  \item Performance improvements
-%  \end{itemize}
-%\end{frame}
-
-
+\begin{frame}
+  To the command line...
+\end{frame}
 
 \end{document}

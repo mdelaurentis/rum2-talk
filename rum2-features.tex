@@ -35,8 +35,9 @@
   \begin{itemize}
   \item Working at Penn (ITMAT) since January
   \item Software engineering background
-  \item Experience in a variety of languages, (Perl, Java, Clojure (lisp), Python, Ruby)
-  \item ... and applications
+  \item Experience in a variety of languages, (Perl, Java, Clojure (lisp), Python, C, Ruby)
+  \item And in a lot of different environments
+  \item Made some big changes to RUM recently
   \end{itemize}
 \end{frame}
 
@@ -88,7 +89,6 @@
 
   \begin{columns}
     \column{2in}
-%http://upload.wikimedia.org/wikipedia/commons/2/29/Cut_sugarcane.jpg
     \includegraphics[scale=0.06]{Cut_sugarcane.jpg}
     \column{3in}
   \begin{itemize}
@@ -127,33 +127,19 @@
     \column{2.5in}
     \includegraphics[scale=0.2]{Rum_in_barrels_at_travellers_distillery.jpg}
   \end{columns}
-
-
-
-%http://upload.wikimedia.org/wikipedia/en/9/98/Rum_in_barrels_at_travellers_distillery.jpg
 \end{frame}
 
 \section{Tour of the new RUM}
 
-\begin{frame}{RUM 2 Goals}
+\begin{frame}{Big changes for RUM 2}
   \begin{itemize}
-  \item More code reuse for maintainability
+  \item Focus on code reuse / modularity
+  \item Standardize installation process
+  \item Revamp command-line interface
   \item Improve inter-process communication
   \item More robust job state management
   \item Automated tests
-  \end{itemize}
-\end{frame}
-
-\begin{frame}{Enhancements in RUM 2}
-  \begin{itemize}
-  \item Standard installation process
-  \item New command-line interface
-  \item Get status of running job
-  \item Restart a job where it left off
-  \item More reliable kill command
-  \item Run a chunk or postprocessing by itself
-  \item Relocatable indexes
-  \item SAM file is closer to conforming to standard
+  \item Extensible support for clusters
   \end{itemize}
 \end{frame}
 
@@ -275,6 +261,8 @@ rum_runner align \
 \end{frame}
 
 \begin{frame}{Job state management}
+  \begin{columns}
+    \column{2.75in}
   \begin{itemize}
   \item Model the workflow as a state machine
   \item A completed step transitions the job from one state to another
@@ -284,6 +272,9 @@ rum_runner align \
   \item Similar to GNU Make (but simpler)
   \item Basis for a lot of additional features
   \end{itemize}
+    \column{2.25in}
+    \includegraphics[scale=0.3]{state-machine.pdf}
+  \end{columns}
 \end{frame}
 
 \begin{frame}{Recovering from errors}
@@ -322,9 +313,9 @@ rum_runner align \
 
 \begin{frame}{Work distribution}
   \begin{columns}
-    \column{2.5in}
-    \includegraphics[scale=0.4]{doozers.jpg}    
-    \column{2.5in}
+    \column{2in}
+    \includegraphics[scale=0.8]{doozers.jpg}    
+    \column{3in}
     \begin{itemize}
     \item Automatic support for one multi-core machine (will run each chunk in a separate process by default)
     \item Built-in support for Sun Grid Engine, with \texttt{--qsub} option
@@ -368,8 +359,6 @@ rum_runner -o <dir> --postprocess
 
 \end{frame}
 
-% http://tomboythatwearsmakeup.com/wp-content/uploads/2011/03/dz_fr_012-1.jpg
-
 \section{Demo}
 
 \subsection{Web resources}
@@ -395,6 +384,19 @@ rum_runner -o <dir> --postprocess
 
 \begin{frame}
   To the command line...
+\end{frame}
+
+\section{Wrap up}
+
+\begin{frame}{Image credits}
+  \begin{itemize}
+    \item \url{http://cbil.upenn.edu/RUM/rumpouring2.gif}
+    \item \url{http://upload.wikimedia.org/wikipedia/commons/2/29/Cut\_sugarcane.jpg}
+    \item \url{http://upload.wikimedia.org/wikipedia/en/9/98/Rum\_in\_barrels\_at\_travellers\_distillery.jpg}
+    \item \url{http://theprosperityproject.blogspot.com/2010/04/if-at-first-you-dont-succeed.html}
+    \item \url{http://muppet.wikia.com/wiki/Doozers}
+  \end{itemize}
+  
 \end{frame}
 
 \end{document}

@@ -4,7 +4,7 @@
 \usetheme{Copenhagen}
 %\usetheme{Singapore}
 %\usetheme{Montpellier}
-\title[RUM 2]{RUM 2 (RNA-Seq Unified Mapper)}
+\title[RUM 2]{RUM 2}
 \bibliographystyle{unsrt}
 \author{Mike DeLaurentis}
 \institute{University of Pennsylvania}
@@ -45,6 +45,7 @@
 
 \begin{frame}{What is RUM?}
   \begin{itemize}
+  \item RNA-Seq Unified Mapper
   \item \textit{``RUM is an alignment, junction calling, and feature quantification pipeline specifically designed for Illumina RNA-Seq data''}
   \item Written by Gregory Grant (ggrant@grant.org)
   \item Runs on Linux / UNIX / Mac
@@ -132,15 +133,21 @@
 \section{Tour of the new RUM}
 
 \begin{frame}{Big changes for RUM 2}
+  \begin{columns}
+    \column{3in}
   \begin{itemize}
   \item Focus on code reuse / modularity
   \item Improve inter-process communication
-  \item More robust job state management
-  \item Automated tests
+  \item Robust job state management
+  \item Add automated tests
   \item Standardize installation process
   \item Revamp command-line interface
   \item Extensible support for clusters
   \end{itemize}
+  \column{2in}
+  \includegraphics[scale=0.35]{rum-logo.png}
+  
+\end{columns}
 \end{frame}
 
 \subsection{Installation}
@@ -161,6 +168,7 @@
   \begin{itemize}
   \item RUM needs an index for each organism you want to align against
   \item Index includes genome, gene annotations, and binary index files for Bowtie
+  \item Pre-build indexes are available for many organisms
   \item Index installation is now separate from code installation / upgrade
   \item Run \texttt{rum\_indexes}; it will guide you through the process
   \end{itemize}
@@ -283,15 +291,16 @@ rum_runner align \
     \includegraphics[scale=0.2]{success.jpg}
     \column{2.5in}
     \begin{itemize}
-
+      
+      \pause
     \item In case of failure...
-
+      \pause
     \item RUM 2 allows easier recovery
-
+      \pause
     \item Running ``\texttt{rum\_runner align}'' again, RUM will determine what state the job was in when it failed
-
+      \pause
     \item Just resumes at the next uncompleted step
-
+      \pause
     \item Can save \textit{a lot} of time when recovering from infrastructure failure
 
     \end{itemize}
@@ -300,20 +309,13 @@ rum_runner align \
 \end{frame}
 
 \begin{frame}{Other benefits of job state management}
+  \begin{itemize}
   \item Can delete a corrupt file and rerun rest of job
   \item Independent of cluster
   \item Can generate ``plan'' for job
+  \item Export to Makefile or some workflow management tool
   \item Possibility for finer-grained parallelism
-\end{frame}
-
-\begin{frame}[fragile]{Killing a job}
-\begin{itemize}
-\item To stop a job and remove all of its output:
-\begin{verbatim}
-  rum_runner kill -o dir
-\end{verbatim}
-\item Useful if you've run a job with incorrect parameters and need to start over
-\end{itemize}
+  \end{itemize}
 \end{frame}
 
 \subsection{Work distribution}
@@ -343,7 +345,7 @@ different machines:
 \item  Run preprocessing alone:
 
 \begin{verbatim}
-rum_runner -o <dir> --preprocess
+rum_runner align -o <dir> --preprocess
 \end{verbatim}
 
 \pause
@@ -351,7 +353,7 @@ rum_runner -o <dir> --preprocess
 \item Run chunks one at a time:
 
 \begin{verbatim}
-rum_runner -o <dir> --process --chunk 8
+rum_runner align -o <dir> --process --chunk 8
 \end{verbatim}
 
 \pause
@@ -359,11 +361,21 @@ rum_runner -o <dir> --process --chunk 8
 \item Run postprocessing alone:
 
 \begin{verbatim}
-rum_runner -o <dir> --postprocess
+rum_runner align -o <dir> --postprocess
 \end{verbatim}
 
 \end{itemize}
 
+\end{frame}
+
+\begin{frame}{Other enhancements}
+  \begin{itemize}
+  \item More reliable ``kill'' command
+  \item CTRL-C works for jobs run locally
+  \item SAM file closer to spec
+  \item Relocatable indexes
+  \end{itemize}
+  
 \end{frame}
 
 \section{Demo}
